@@ -4,6 +4,9 @@
 
 > **Discover the next viral tweets before they explode!** 
 
+
+
+
 A powerful Chrome extension that filters your X/Twitter feed to show only high-engagement, trending content. Never miss the next big thing again.
 
 ⚠️ **Important**: This extension must be installed locally - it's not available on the Chrome Web Store yet.
@@ -13,6 +16,8 @@ A powerful Chrome extension that filters your X/Twitter feed to show only high-e
 [![Contributors](https://img.shields.io/github/contributors/tpwatson/ai-x-extension)](https://github.com/tpwatson/ai-x-extension/graphs/contributors)
 [![Issues](https://img.shields.io/github/issues/tpwatson/ai-x-extension)](https://github.com/tpwatson/ai-x-extension/issues)
 
+---
+https://github.com/user-attachments/assets/3e66c04c-0b4f-478c-b3e6-d5707b8d6991
 ---
 
 ## 🎯 Features
