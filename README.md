@@ -17,8 +17,12 @@ A powerful Chrome extension that filters your X/Twitter feed to show only high-e
 [![Issues](https://img.shields.io/github/issues/tpwatson/ai-x-extension)](https://github.com/tpwatson/ai-x-extension/issues)
 
 ---
+
+## Demo
+
+
 https://github.com/user-attachments/assets/3e66c04c-0b4f-478c-b3e6-d5707b8d6991
----
+
 
 ## 🎯 Features
 
