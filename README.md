@@ -1,14 +1,17 @@
 # 🚀 Pre-Viral Tweet Filter
 
+![Pre-Viral Tweet Filter Demo](docs/givemeviraltweets.png)
+
 > **Discover the next viral tweets before they explode!** 
 
 A powerful Chrome extension that filters your X/Twitter feed to show only high-engagement, trending content. Never miss the next big thing again.
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Extension-v1.0-blue?logo=google-chrome&logoColor=white)](https://chrome.google.com/webstore)
+⚠️ **Important**: This extension must be installed locally - it's not available on the Chrome Web Store yet.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Stars](https://img.shields.io/github/stars/yourusername/ai-x-extension?style=social)](https://github.com/yourusername/ai-x-extension)
-[![Contributors](https://img.shields.io/github/contributors/yourusername/ai-x-extension)](https://github.com/yourusername/ai-x-extension/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/yourusername/ai-x-extension)](https://github.com/yourusername/ai-x-extension/issues)
+[![Stars](https://img.shields.io/github/stars/tpwatson/ai-x-extension?style=social)](https://github.com/tpwatson/ai-x-extension)
+[![Contributors](https://img.shields.io/github/contributors/tpwatson/ai-x-extension)](https://github.com/tpwatson/ai-x-extension/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/tpwatson/ai-x-extension)](https://github.com/tpwatson/ai-x-extension/issues)
 
 ---
 
@@ -82,7 +85,7 @@ function shouldShowTweet(tweetData) {
 
 1. **Download the extension**
    ```bash
-   git clone https://github.com/yourusername/ai-x-extension.git
+   git clone https://github.com/tpwatson/ai-x-extension.git
    ```
 
 2. **Load in Chrome**
@@ -106,7 +109,7 @@ function shouldShowTweet(tweetData) {
 #### Development Setup
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ai-x-extension.git
+git clone https://github.com/tpwatson/ai-x-extension.git
 cd ai-x-extension
 
 # Load in Chrome for development
@@ -215,7 +218,7 @@ We love contributions! Here's how you can help:
 
 ### 🐛 Bug Reports
 
-Found a bug? [Open an issue](https://github.com/yourusername/ai-x-extension/issues) with:
+Found a bug? [Open an issue](https://github.com/tpwatson/ai-x-extension/issues) with:
 - Browser version and OS
 - Extension version
 - Steps to reproduce
@@ -263,7 +266,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/ai-x-extension&type=Date)](https://star-history.com/#yourusername/ai-x-extension&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=tpwatson/ai-x-extension&type=Date)](https://star-history.com/#tpwatson/ai-x-extension&Date)
 
 ---
 
@@ -271,7 +274,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ for the X/Twitter community**
 
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-lightgrey?logo=github)](https://github.com/yourusername)
-[![Twitter](https://img.shields.io/badge/Twitter-Follow-blue?logo=twitter)](https://twitter.com/yourusername)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-lightgrey?logo=github)](https://github.com/tpwatson)
+[![Twitter](https://img.shields.io/badge/Twitter-Follow-blue?logo=twitter)](https://twitter.com/tpwatson)
 
 </div> 
