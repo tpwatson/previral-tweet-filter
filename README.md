@@ -12,9 +12,9 @@ A powerful Chrome extension that filters your X/Twitter feed to show only high-e
 ⚠️ **Important**: This extension must be installed locally - it's not available on the Chrome Web Store yet.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Stars](https://img.shields.io/github/stars/tpwatson/ai-x-extension?style=social)](https://github.com/tpwatson/ai-x-extension)
-[![Contributors](https://img.shields.io/github/contributors/tpwatson/ai-x-extension)](https://github.com/tpwatson/ai-x-extension/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/tpwatson/ai-x-extension)](https://github.com/tpwatson/ai-x-extension/issues)
+[![Stars](https://img.shields.io/github/stars/tpwatson/previral-tweet-filter?style=social)](https://github.com/tpwatson/previral-tweet-filter)
+[![Contributors](https://img.shields.io/github/contributors/tpwatson/previral-tweet-filter)](https://github.com/tpwatson/previral-tweet-filter/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/tpwatson/previral-tweet-filter)](https://github.com/tpwatson/previral-tweet-filter/issues)
 
 ---
 
@@ -94,7 +94,7 @@ function shouldShowTweet(tweetData) {
 
 1. **Download the extension**
    ```bash
-   git clone https://github.com/tpwatson/ai-x-extension.git
+   git clone https://github.com/tpwatson/previral-tweet-filter.git
    ```
 
 2. **Load in Chrome**
@@ -118,8 +118,8 @@ function shouldShowTweet(tweetData) {
 #### Development Setup
 ```bash
 # Clone the repository
-git clone https://github.com/tpwatson/ai-x-extension.git
-cd ai-x-extension
+git clone https://github.com/tpwatson/previral-tweet-filter.git
+cd previral-tweet-filter
 
 # Load in Chrome for development
 # 1. Open chrome://extensions/
@@ -227,7 +227,7 @@ We love contributions! Here's how you can help:
 
 ### 🐛 Bug Reports
 
-Found a bug? [Open an issue](https://github.com/tpwatson/ai-x-extension/issues) with:
+Found a bug? [Open an issue](https://github.com/tpwatson/previral-tweet-filter/issues) with:
 - Browser version and OS
 - Extension version
 - Steps to reproduce
@@ -275,7 +275,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=tpwatson/ai-x-extension&type=Date)](https://star-history.com/#tpwatson/ai-x-extension&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=tpwatson/previral-tweet-filter&type=Date)](https://star-history.com/#tpwatson/previral-tweet-filter&Date)
 
 ---
 
