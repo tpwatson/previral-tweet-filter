@@ -62,16 +62,18 @@ let isProcessing = false;
 const BATCH_SIZE = 10;
 let enableFilter = false;
 let timeThreshold = 6;
+let timeUnit = 'hours';
 let engagementRate = 5;
 
 function loadSettings() {
     console.log("Loading settings");
-    chrome.storage.sync.get(['enableFilter', 'timeThreshold', 'engagementRate'], function (result) {
+    chrome.storage.sync.get(['enableFilter', 'timeThreshold', 'timeUnit', 'engagementRate'], function (result) {
         enableFilter = result.enableFilter || false;
         timeThreshold = result.timeThreshold || 6;
+        timeUnit = result.timeUnit || 'hours';
         engagementRate = result.engagementRate || 5;
 
-        console.log("Settings loaded:", { enableFilter, timeThreshold, engagementRate });
+        console.log("Settings loaded:", { enableFilter, timeThreshold, timeUnit, engagementRate });
 
         if (enableFilter) {
             prepareInitialTweetQueue();
@@ -244,10 +246,17 @@ function shouldShowTweet(tweetData) {
 
     const now = new Date();
     const tweetDate = new Date(tweetData.timestamp);
-    const hoursSincePosted = (now - tweetDate) / (1000 * 60 * 60);
+    const timeSincePostedMs = now - tweetDate;
+    
+    let timeSincePostedInUnit;
+    if (timeUnit === 'minutes') {
+        timeSincePostedInUnit = timeSincePostedMs / (1000 * 60);
+    } else {
+        timeSincePostedInUnit = timeSincePostedMs / (1000 * 60 * 60);
+    }
 
-    if (hoursSincePosted > timeThreshold) {
-        console.log('HIDE ✖️ Hours since posted:', hoursSincePosted, '\n Time threshold:', timeThreshold);
+    if (timeSincePostedInUnit > timeThreshold) {
+        console.log(`HIDE ✖️ Time since posted: ${timeSincePostedInUnit.toFixed(2)} ${timeUnit}, Time threshold: ${timeThreshold} ${timeUnit}`);
         return false;
     }
 
@@ -349,6 +358,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if (request.action !== "loadMoreTweets") {
             enableFilter = request.settings.enableFilter;
             timeThreshold = request.settings.timeThreshold;
+            timeUnit = request.settings.timeUnit;
             engagementRate = request.settings.engagementRate;
         }
 
