@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pre-Viral Tweet Filter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 380px;
+            min-height: 500px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1d23 100%);
+            color: #e7e9ea;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1d9bf0, #1da1f2, #1d9bf0);
+            z-index: 1;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #1d9bf0, #1da1f2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            position: relative;
+        }
+
+        h2::after {
+            content: '→';
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 18px;
+            opacity: 0.8;
+            color: #1d9bf0;
+        }
+
+        .setting {
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .setting:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(29, 155, 240, 0.3);
+            transform: translateY(-1px);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #e7e9ea;
+        }
+
+        .time-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .time-controls input[type="number"] {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e7e9ea;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .time-controls input[type="number"]:focus {
+            outline: none;
+            border-color: #1d9bf0;
+            background: rgba(29, 155, 240, 0.1);
+            box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.2);
+        }
+
+        .time-controls select {
+            width: 90px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e7e9ea;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-controls select:focus {
+            outline: none;
+            border-color: #1d9bf0;
+            background: rgba(29, 155, 240, 0.1);
+        }
+
+        /* Dropdown option styling */
+        .time-controls select option {
+            background-color: #1a1d23;
+            color: #e7e9ea;
+            padding: 8px;
+        }
+
+        .time-controls select option:hover {
+            background-color: #1d9bf0;
+        }
+
+        input[type="number"] {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e7e9ea;
+            font-size: 14px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #1d9bf0;
+            background: rgba(29, 155, 240, 0.1);
+            box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.2);
+        }
+
+        /* Custom toggle switch styling */
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #1d9bf0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #e7e9ea;
+        }
+
+        .filter-subtitle {
+            font-size: 11px;
+            color: rgba(231, 233, 234, 0.6);
+            margin-top: 2px;
+        }
+
+        /* Custom checkbox styling */
+        input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            margin-right: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="checkbox"]:checked {
+            background: #1d9bf0;
+            border-color: #1d9bf0;
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        input[type="checkbox"]:hover {
+            border-color: #1d9bf0;
+            background: rgba(29, 155, 240, 0.1);
+        }
+
+        .whitelist-section {
+            border: 1px solid rgba(29, 155, 240, 0.3);
+            padding: 16px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(29, 155, 240, 0.05), rgba(29, 155, 240, 0.02));
+            position: relative;
+        }
+
+        .whitelist-section::before {
+            content: '★';
+            position: absolute;
+            top: -8px;
+            left: 16px;
+            background: #0f1419;
+            padding: 0 8px;
+            font-size: 12px;
+            color: #1d9bf0;
+        }
+
+        .add-account-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .add-account-container input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #e7e9ea;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .add-account-container input:focus {
+            outline: none;
+            border-color: #1d9bf0;
+            background: rgba(29, 155, 240, 0.1);
+            box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.2);
+        }
+
+        .add-account-container input::placeholder {
+            color: rgba(231, 233, 234, 0.5);
+        }
+
+        .add-account-container button {
+            width: 60px;
+            font-size: 12px;
+            background: linear-gradient(135deg, #1d9bf0, #1da1f2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .add-account-container button:hover {
+            background: linear-gradient(135deg, #1a8cd8, #1d9bf0);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(29, 155, 240, 0.3);
+        }
+
+        .account-list {
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .account-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .account-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .account-list::-webkit-scrollbar-thumb {
+            background: rgba(29, 155, 240, 0.5);
+            border-radius: 3px;
+        }
+
+        .account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.2s ease;
+        }
+
+        .account-item:hover {
+            background: rgba(29, 155, 240, 0.1);
+        }
+
+        .account-item:last-child {
+            border-bottom: none;
+        }
+
+        .account-name {
+            font-size: 13px;
+            color: #e7e9ea;
+            font-weight: 500;
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #f91880, #e0245e);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .remove-btn:hover {
+            background: linear-gradient(135deg, #e0245e, #c01e4e);
+            transform: scale(1.05);
+        }
+
+        .empty-list {
+            padding: 20px;
+            text-align: center;
+            color: rgba(231, 233, 234, 0.6);
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        /* Action buttons */
+        button[id="saveSettings"], button[id="loadMoreTweets"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button[id="saveSettings"] {
+            background: linear-gradient(135deg, #1d9bf0, #1da1f2);
+            color: white;
+        }
+
+        button[id="saveSettings"]:hover {
+            background: linear-gradient(135deg, #1a8cd8, #1d9bf0);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(29, 155, 240, 0.4);
+        }
+
+        button[id="loadMoreTweets"] {
+            background: linear-gradient(135deg, #17bf63, #1da1f2);
+            color: white;
+        }
+
+        button[id="loadMoreTweets"]:hover {
+            background: linear-gradient(135deg, #15a052, #1a8cd8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(23, 191, 99, 0.4);
+        }
+
+        button[id="loadMoreTweets"]:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(231, 233, 234, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Engagement rate container visibility */
+        #engagementRateContainer {
+            transition: all 0.3s ease;
+        }
+
+        #engagementRateContainer[style*="display: none"] {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+    </style>
+</head>
+<body>
+    <h2>Pre-Viral Tweet Filter</h2>
+
+    <div class="setting">
+        <div class="filter-header">
+            <div>
+                <div class="filter-title">Time Filter</div>
+                <div class="filter-subtitle">Filter tweets by age</div>
+            </div>
+            <div class="toggle-switch" id="enableFilterToggle"></div>
+        </div>
+        <label for="timeThreshold">Time Threshold:</label>
+        <div class="time-controls">
+            <input type="number" id="timeThreshold" min="1" max="24" value="6">
+            <select id="timeUnit">
+                <option value="hours">Hours</option>
+                <option value="minutes">Minutes</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="setting">
+        <div class="filter-header">
+            <div>
+                <div class="filter-title">Engagement Filter</div>
+                <div class="filter-subtitle">Filter by engagement rate</div>
+            </div>
+            <div class="toggle-switch" id="enableEngagementFilterToggle"></div>
+        </div>
+        <div id="engagementRateContainer">
+            <label for="engagementRate">Minimum Engagement Rate (%):</label>
+            <input type="number" id="engagementRate" min="1" max="100" value="5">
+        </div>
+    </div>
+    
+    <div class="setting">
+        <div class="whitelist-section">
+            <label>Always Show Tweets From:</label>
+            <div class="add-account-container">
+                <input type="text" id="accountInput" placeholder="@username or username" maxlength="50">
+                <button id="addAccount">Add</button>
+            </div>
+            <div class="account-list" id="accountList">
+                <div class="empty-list">No accounts added</div>
+            </div>
+        </div>
+    </div>
+
+    <button id="saveSettings">Save Settings</button>
+
+    <div class="setting">
+        <button id="loadMoreTweets">Load More Tweets</button>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

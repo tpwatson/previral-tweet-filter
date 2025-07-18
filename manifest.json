@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Pre-Viral Tweet Filter",
+  "version": "1.0",
+  "permissions": [
+    "storage", 
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://x.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*"],
+      "js": ["content.js"]
+    }
+  ]
+}

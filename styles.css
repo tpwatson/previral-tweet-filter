@@ -1,0 +1,24 @@
+.pre-viral-tweet {
+    border: 2px solid #1DA1F2 !important;
+    border-radius: 10px !important;
+    padding: 10px !important;
+    position: relative !important;
+}
+
+.pre-viral-tweet::before {
+    content: "🚀 Pre-Viral";
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background-color: #1DA1F2;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1000;
+}
+
+.hidden-tweet {
+    display: none !important;
+}
