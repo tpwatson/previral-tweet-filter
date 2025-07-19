@@ -5,8 +5,11 @@ function saveSettings(callback) {
     const timeUnitSelect = document.getElementById('timeUnit');
     const enableEngagementFilterToggle = document.getElementById('enableEngagementFilterToggle');
     const engagementRateInput = document.getElementById('engagementRate');
+    const enableFollowerFilterToggle = document.getElementById('enableFollowerFilterToggle');
+    const followerCountInput = document.getElementById('followerCount');
+    const followerUnitSelect = document.getElementById('followerUnit');
     
-    if (!enableFilterToggle || !timeThresholdInput || !timeUnitSelect || !enableEngagementFilterToggle || !engagementRateInput) {
+    if (!enableFilterToggle || !timeThresholdInput || !timeUnitSelect || !enableEngagementFilterToggle || !engagementRateInput || !enableFollowerFilterToggle || !followerCountInput || !followerUnitSelect) {
         console.error('Required elements not found');
         if (callback) callback();
         return;
@@ -17,6 +20,9 @@ function saveSettings(callback) {
     const timeUnit = timeUnitSelect.value;
     const enableEngagementFilter = enableEngagementFilterToggle.classList.contains('active');
     const engagementRate = parseInt(engagementRateInput.value);
+    const enableFollowerFilter = enableFollowerFilterToggle.classList.contains('active');
+    const followerCount = parseInt(followerCountInput.value);
+    const followerUnit = followerUnitSelect.value;
 
     chrome.storage.sync.set({
         enableFilter: enableFilter,
@@ -24,6 +30,9 @@ function saveSettings(callback) {
         timeUnit: timeUnit,
         enableEngagementFilter: enableEngagementFilter,
         engagementRate: engagementRate,
+        enableFollowerFilter: enableFollowerFilter,
+        followerCount: followerCount,
+        followerUnit: followerUnit,
         whitelistedAccounts: window.whitelistedAccounts || []
     }, function() {
         console.log('Settings saved');
@@ -38,11 +47,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const enableEngagementFilterToggle = document.getElementById('enableEngagementFilterToggle');
     const engagementRateInput = document.getElementById('engagementRate');
     const engagementRateContainer = document.getElementById('engagementRateContainer');
+
     const accountInput = document.getElementById('accountInput');
     const addAccountButton = document.getElementById('addAccount');
     const accountList = document.getElementById('accountList');
     const saveSettingsButton = document.getElementById('saveSettings');
-    const loadMoreButton = document.getElementById('loadMoreTweets');
+
+
+
 
     // Make whitelistedAccounts globally accessible
     window.whitelistedAccounts = [];
@@ -133,6 +145,10 @@ document.addEventListener('DOMContentLoaded', function () {
         engagementRateContainer.style.display = isEnabled ? 'block' : 'none';
     }
 
+
+
+
+
     // Load saved settings
     chrome.storage.sync.get(['enableFilter', 'timeThreshold', 'timeUnit', 'enableEngagementFilter', 'engagementRate', 'whitelistedAccounts'], function (result) {
         const enableFilter = result.enableFilter || false;
@@ -151,15 +167,12 @@ document.addEventListener('DOMContentLoaded', function () {
         updateTimeInputLimits();
         updateEngagementRateVisibility();
         updateAccountListDisplay();
-
-        // Enable or disable the Load More button based on the filter state
-        loadMoreButton.disabled = !enableFilter;
     });
 
     // Event listeners for toggles
     enableFilterToggle.addEventListener('click', function() {
         handleToggleClick(enableFilterToggle, function(isEnabled) {
-            loadMoreButton.disabled = !isEnabled;
+            // Toggle functionality
         });
     });
 
@@ -168,6 +181,8 @@ document.addEventListener('DOMContentLoaded', function () {
             updateEngagementRateVisibility();
         });
     });
+
+
 
     // Event listeners
     addAccountButton.addEventListener('click', addAccount);
@@ -206,39 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    loadMoreButton.addEventListener('click', function() {
-        saveSettings(function() {
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, {
-                    action: "updateSettingsAndLoadMoreTweets",
-                    settings: getCurrentSettings()
-                });
-            });
-            window.close();
-        });
-    });
+
     
 });
 
-// Add this function at the end of your popup.js file
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.action === "loadMoreTweets") {
-        saveSettings(function() {
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                if (tabs && tabs[0]) {
-                    chrome.tabs.sendMessage(tabs[0].id, {
-                        action: "updateSettingsAndLoadMoreTweets",
-                        settings: {
-                            enableFilter: document.getElementById('enableFilterToggle')?.classList.contains('active') || false,
-                            timeThreshold: parseInt(document.getElementById('timeThreshold')?.value || '6'),
-                            timeUnit: document.getElementById('timeUnit')?.value || 'hours',
-                            enableEngagementFilter: document.getElementById('enableEngagementFilterToggle')?.classList.contains('active') || false,
-                            engagementRate: parseInt(document.getElementById('engagementRate')?.value || '5'),
-                            whitelistedAccounts: window.whitelistedAccounts || []
-                        }
-                    });
-                }
-            });
-        });
-    }
-});

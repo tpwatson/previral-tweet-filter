@@ -64,23 +64,57 @@ let enableFilter = false;
 let timeThreshold = 6;
 let timeUnit = 'hours';
 let engagementRate = 5;
+let enableEngagementFilter = true;
+
+
+
+
+
+// Fetch follower count from Twitter profile page
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function loadSettings() {
     console.log("Loading settings");
-    chrome.storage.sync.get(['enableFilter', 'timeThreshold', 'timeUnit', 'engagementRate'], function (result) {
-        enableFilter = result.enableFilter || false;
-        timeThreshold = result.timeThreshold || 6;
-        timeUnit = result.timeUnit || 'hours';
-        engagementRate = result.engagementRate || 5;
+    try {
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+            chrome.storage.sync.get(['enableFilter', 'timeThreshold', 'timeUnit', 'engagementRate', 'enableEngagementFilter'], function (result) {
+                if (chrome.runtime.lastError) {
+                    console.error('Chrome storage error:', chrome.runtime.lastError);
+                    return;
+                }
+                
+                enableFilter = result.enableFilter || false;
+                timeThreshold = result.timeThreshold || 6;
+                timeUnit = result.timeUnit || 'hours';
+                engagementRate = result.engagementRate || 5;
+                enableEngagementFilter = result.enableEngagementFilter !== undefined ? result.enableEngagementFilter : true;
 
-        console.log("Settings loaded:", { enableFilter, timeThreshold, timeUnit, engagementRate });
+                console.log("Settings loaded:", { enableFilter, timeThreshold, timeUnit, engagementRate, enableEngagementFilter });
 
-        if (enableFilter) {
-            prepareInitialTweetQueue();
+                if (enableFilter) {
+                    prepareInitialTweetQueue();
+                } else {
+                    showAllTweets();
+                }
+            });
         } else {
-            showAllTweets();
+            console.warn('Chrome storage API not available');
         }
-    });
+    } catch (error) {
+        console.error('Error loading settings:', error);
+    }
 }
 
 function createLoadMoreButton() {
@@ -187,6 +221,10 @@ async function processTweetQueue() {
     
     for (let i = 0; i < batch.length; i++) {
         await filterTweet(batch[i]);
+        // Add small delay between tweets to prevent overwhelming the DOM
+        if (i < batch.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 50)); // 50ms delay
+        }
         if (i === batch.length - 1) {
             isProcessing = false;
             console.log("Batch processing complete. Press 'Load More Tweets' for the next batch.");
@@ -194,7 +232,7 @@ async function processTweetQueue() {
     }
 }
 
-function extractTweetData(tweetElement) {
+async function extractTweetData(tweetElement) {
     const data = {
         timestamp: new Date(),
         likes: 0,
@@ -241,6 +279,10 @@ function extractTweetData(tweetElement) {
     return data;
 }
 
+
+
+
+
 function shouldShowTweet(tweetData) {
     if (!enableFilter) return true;
 
@@ -255,20 +297,31 @@ function shouldShowTweet(tweetData) {
         timeSincePostedInUnit = timeSincePostedMs / (1000 * 60 * 60);
     }
 
+    console.log(`Tweet timestamp: ${tweetDate.toISOString()}, Current time: ${now.toISOString()}`);
+    console.log(`Time since posted: ${timeSincePostedInUnit.toFixed(2)} ${timeUnit}, Threshold: ${timeThreshold} ${timeUnit}`);
+
     if (timeSincePostedInUnit > timeThreshold) {
         console.log(`HIDE ✖️ Time since posted: ${timeSincePostedInUnit.toFixed(2)} ${timeUnit}, Time threshold: ${timeThreshold} ${timeUnit}`);
         return false;
     }
 
-    const totalEngagements = tweetData.likes + tweetData.retweets + tweetData.comments + tweetData.bookmarks;
-    const engagementRateCalculated = (totalEngagements / Math.max(tweetData.views, 1)) * 100;
+    // Engagement rate filtering
+    if (enableEngagementFilter) {
+        const totalEngagements = tweetData.likes + tweetData.retweets + tweetData.comments + tweetData.bookmarks;
+        const engagementRateCalculated = (totalEngagements / Math.max(tweetData.views, 1)) * 100;
 
-    if (engagementRateCalculated < engagementRate) {
-        console.log('HIDE ✖️ Engagement rate:', engagementRateCalculated, '\n Engagement threshold:', engagementRate);
-        return false;
+        if (engagementRateCalculated < engagementRate) {
+            console.log('HIDE ✖️ Engagement rate:', engagementRateCalculated, '\n Engagement threshold:', engagementRate);
+            return false;
+        }
+        
+        console.log('SHOW🚀 Engagement rate:', engagementRateCalculated, '\n Engagement threshold:', engagementRate);
+    } else {
+        console.log('✓ Engagement filter disabled, skipping engagement rate check');
     }
 
-    console.log('SHOW🚀 Engagement rate:', engagementRateCalculated, '\n Engagement threshold:', engagementRate);
+
+
     return true;
 }
 
@@ -303,7 +356,7 @@ async function filterTweet(tweetElement) {
         return;
     }
 
-    const tweetData = extractTweetData(tweetElement);
+    const tweetData = await extractTweetData(tweetElement);
     const shouldShow = shouldShowTweet(tweetData);
     console.log('Tweet data:', tweetData, 'Should show:', shouldShow);
 
@@ -352,29 +405,51 @@ function addNewTabBehavior(tweetElement) {
     }, true);
 }
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-    console.log("Message received:", request);
-    if (request.action === "updateSettingsAndFilter" || request.action === "updateSettingsAndLoadMoreTweets" || request.action === "loadMoreTweets") {
-        if (request.action !== "loadMoreTweets") {
-            enableFilter = request.settings.enableFilter;
-            timeThreshold = request.settings.timeThreshold;
-            timeUnit = request.settings.timeUnit;
-            engagementRate = request.settings.engagementRate;
-        }
+// Add message listener with error handling
+try {
+    if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
+        chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+            console.log("Message received:", request);
+            
+            if (request.action === "updateSettingsAndFilter" || request.action === "updateSettingsAndLoadMoreTweets") {
+                // Always update settings if they are provided in the request
+                if (request.settings) {
+                    enableFilter = request.settings.enableFilter;
+                    timeThreshold = request.settings.timeThreshold;
+                    timeUnit = request.settings.timeUnit;
+                    engagementRate = request.settings.engagementRate;
+                    enableEngagementFilter = request.settings.enableEngagementFilter;
+                    console.log("Settings updated:", { enableFilter, timeThreshold, timeUnit, engagementRate, enableEngagementFilter });
+                }
 
-        if (enableFilter) {
-            if (request.action === "updateSettingsAndLoadMoreTweets" || request.action === "loadMoreTweets") {
-                processTweetQueue();
-            } else {
-                prepareInitialTweetQueue();
-                processTweetQueue();
+                if (enableFilter) {
+                    if (request.action === "updateSettingsAndLoadMoreTweets") {
+                        processTweetQueue();
+                    } else {
+                        prepareInitialTweetQueue();
+                        processTweetQueue();
+                    }
+                } else {
+                    showAllTweets();
+                }
             }
-        } else {
-            showAllTweets();
-        }
+        });
+    } else {
+        console.warn('Chrome runtime API not available');
     }
-});
+} catch (error) {
+    console.error('Error setting up message listener:', error);
+}
 
 initTweetFilter();
 
-setInterval(ensureButtonExists, 5000);
+// Reload settings periodically to catch changes made in popup
+// Only set intervals if Chrome APIs are available
+try {
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+        setInterval(loadSettings, 10000); // Reload settings every 10 seconds
+    }
+    setInterval(ensureButtonExists, 5000);
+} catch (error) {
+    console.error('Error setting up intervals:', error);
+}
