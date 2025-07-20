@@ -165,9 +165,14 @@ function loadSettings() {
 
                 console.log("Settings loaded:", { enableFilter, timeThreshold, timeUnit, engagementRate, enableEngagementFilter, enableIndividualFilters, minLikes, minComments, minReposts, minBookmarks, minViews, favoriteAccounts });
 
-                if (enableFilter) {
+                // Check if any filters are enabled
+                const hasActiveFilters = enableFilter || enableEngagementFilter || enableIndividualFilters;
+                
+                if (hasActiveFilters) {
+                    console.log("✓ Filters are active, preparing tweet queue");
                     prepareInitialTweetQueue();
                 } else {
+                    console.log("✓ No filters active, showing all tweets");
                     showAllTweets();
                 }
             });
