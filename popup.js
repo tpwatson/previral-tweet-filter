@@ -5,11 +5,14 @@ function saveSettings(callback) {
     const timeUnitSelect = document.getElementById('timeUnit');
     const enableEngagementFilterToggle = document.getElementById('enableEngagementFilterToggle');
     const engagementRateInput = document.getElementById('engagementRate');
-    const enableFollowerFilterToggle = document.getElementById('enableFollowerFilterToggle');
-    const followerCountInput = document.getElementById('followerCount');
-    const followerUnitSelect = document.getElementById('followerUnit');
+    const enableIndividualFiltersToggle = document.getElementById('enableIndividualFiltersToggle');
+    const minLikesInput = document.getElementById('minLikes');
+    const minCommentsInput = document.getElementById('minComments');
+    const minRepostsInput = document.getElementById('minReposts');
+    const minBookmarksInput = document.getElementById('minBookmarks');
+    const minViewsInput = document.getElementById('minViews');
     
-    if (!enableFilterToggle || !timeThresholdInput || !timeUnitSelect || !enableEngagementFilterToggle || !engagementRateInput || !enableFollowerFilterToggle || !followerCountInput || !followerUnitSelect) {
+    if (!enableFilterToggle || !timeThresholdInput || !timeUnitSelect || !enableEngagementFilterToggle || !engagementRateInput || !enableIndividualFiltersToggle || !minLikesInput || !minCommentsInput || !minRepostsInput || !minBookmarksInput || !minViewsInput) {
         console.error('Required elements not found');
         if (callback) callback();
         return;
@@ -20,9 +23,12 @@ function saveSettings(callback) {
     const timeUnit = timeUnitSelect.value;
     const enableEngagementFilter = enableEngagementFilterToggle.classList.contains('active');
     const engagementRate = parseInt(engagementRateInput.value);
-    const enableFollowerFilter = enableFollowerFilterToggle.classList.contains('active');
-    const followerCount = parseInt(followerCountInput.value);
-    const followerUnit = followerUnitSelect.value;
+    const enableIndividualFilters = enableIndividualFiltersToggle.classList.contains('active');
+    const minLikes = parseInt(minLikesInput.value) || 0;
+    const minComments = parseInt(minCommentsInput.value) || 0;
+    const minReposts = parseInt(minRepostsInput.value) || 0;
+    const minBookmarks = parseInt(minBookmarksInput.value) || 0;
+    const minViews = parseInt(minViewsInput.value) || 0;
 
     chrome.storage.sync.set({
         enableFilter: enableFilter,
@@ -30,9 +36,12 @@ function saveSettings(callback) {
         timeUnit: timeUnit,
         enableEngagementFilter: enableEngagementFilter,
         engagementRate: engagementRate,
-        enableFollowerFilter: enableFollowerFilter,
-        followerCount: followerCount,
-        followerUnit: followerUnit,
+        enableIndividualFilters: enableIndividualFilters,
+        minLikes: minLikes,
+        minComments: minComments,
+        minReposts: minReposts,
+        minBookmarks: minBookmarks,
+        minViews: minViews,
         whitelistedAccounts: window.whitelistedAccounts || []
     }, function() {
         console.log('Settings saved');
@@ -47,6 +56,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const enableEngagementFilterToggle = document.getElementById('enableEngagementFilterToggle');
     const engagementRateInput = document.getElementById('engagementRate');
     const engagementRateContainer = document.getElementById('engagementRateContainer');
+    const enableIndividualFiltersToggle = document.getElementById('enableIndividualFiltersToggle');
+    const individualFiltersContainer = document.getElementById('individualFiltersContainer');
 
     const accountInput = document.getElementById('accountInput');
     const addAccountButton = document.getElementById('addAccount');
@@ -95,6 +106,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+
+
     // Function to add an account to the whitelist
     function addAccount() {
         const accountName = normalizeAccountName(accountInput.value);
@@ -119,6 +132,12 @@ document.addEventListener('DOMContentLoaded', function () {
         window.whitelistedAccounts = window.whitelistedAccounts.filter(account => account !== accountName);
         updateAccountListDisplay();
     };
+
+    // Function to show/hide individual filters container
+    function updateIndividualFiltersVisibility() {
+        const isEnabled = enableIndividualFiltersToggle.classList.contains('active');
+        individualFiltersContainer.style.display = isEnabled ? 'block' : 'none';
+    }
 
     // Function to update time input min/max based on selected unit
     function updateTimeInputLimits() {
@@ -150,22 +169,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Load saved settings
-    chrome.storage.sync.get(['enableFilter', 'timeThreshold', 'timeUnit', 'enableEngagementFilter', 'engagementRate', 'whitelistedAccounts'], function (result) {
+    chrome.storage.sync.get(['enableFilter', 'timeThreshold', 'timeUnit', 'enableEngagementFilter', 'engagementRate', 'enableIndividualFilters', 'minLikes', 'minComments', 'minReposts', 'minBookmarks', 'minViews', 'whitelistedAccounts'], function (result) {
         const enableFilter = result.enableFilter || false;
-        const enableEngagementFilter = result.enableEngagementFilter !== undefined ? result.enableEngagementFilter : true;
+        const enableEngagementFilter = result.enableEngagementFilter !== undefined ? result.enableEngagementFilter : false;
+        const enableIndividualFilters = result.enableIndividualFilters || false;
         
         // Update toggle states
         updateToggleState(enableFilterToggle, enableFilter);
         updateToggleState(enableEngagementFilterToggle, enableEngagementFilter);
+        updateToggleState(enableIndividualFiltersToggle, enableIndividualFilters);
         
         timeThresholdInput.value = result.timeThreshold || 6;
         timeUnitSelect.value = result.timeUnit || 'hours';
         engagementRateInput.value = result.engagementRate || 5;
+        document.getElementById('minLikes').value = result.minLikes || 0;
+        document.getElementById('minComments').value = result.minComments || 0;
+        document.getElementById('minReposts').value = result.minReposts || 0;
+        document.getElementById('minBookmarks').value = result.minBookmarks || 0;
+        document.getElementById('minViews').value = result.minViews || 0;
         window.whitelistedAccounts = result.whitelistedAccounts || [];
 
         // Update UI based on loaded settings
         updateTimeInputLimits();
         updateEngagementRateVisibility();
+        updateIndividualFiltersVisibility();
         updateAccountListDisplay();
     });
 
@@ -182,6 +209,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    enableIndividualFiltersToggle.addEventListener('click', function() {
+        handleToggleClick(enableIndividualFiltersToggle, function(isEnabled) {
+            updateIndividualFiltersVisibility();
+        });
+    });
+
 
 
     // Event listeners
@@ -193,6 +226,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+
+
     // Update time input limits when unit changes
     timeUnitSelect.addEventListener('change', updateTimeInputLimits);
 
@@ -203,6 +238,12 @@ document.addEventListener('DOMContentLoaded', function () {
             timeUnit: timeUnitSelect.value,
             enableEngagementFilter: enableEngagementFilterToggle.classList.contains('active'),
             engagementRate: parseInt(engagementRateInput.value),
+            enableIndividualFilters: enableIndividualFiltersToggle.classList.contains('active'),
+            minLikes: parseInt(document.getElementById('minLikes').value) || 0,
+            minComments: parseInt(document.getElementById('minComments').value) || 0,
+            minReposts: parseInt(document.getElementById('minReposts').value) || 0,
+            minBookmarks: parseInt(document.getElementById('minBookmarks').value) || 0,
+            minViews: parseInt(document.getElementById('minViews').value) || 0,
             whitelistedAccounts: window.whitelistedAccounts
         };
     }

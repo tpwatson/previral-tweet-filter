@@ -436,6 +436,39 @@
             opacity: 0;
             transform: translateY(-10px);
         }
+
+        /* Individual filters container visibility */
+        #individualFiltersContainer {
+            transition: all 0.3s ease;
+        }
+
+        #individualFiltersContainer[style*="display: none"] {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        /* Engagement filter row styling */
+        .engagement-filter-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .engagement-filter-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .engagement-filter-row label {
+            flex: 1;
+            margin-bottom: 0;
+            font-size: 13px;
+        }
+
+        .engagement-filter-row input {
+            width: 80px;
+            min-width: 80px;
+        }
     </style>
 </head>
 <body>
@@ -462,14 +495,46 @@
     <div class="setting">
         <div class="filter-header">
             <div>
-                <div class="filter-title">Engagement Filter</div>
-                <div class="filter-subtitle">Filter by engagement rate</div>
+                <div class="filter-title">Engagement Rate Filter</div>
+                <div class="filter-subtitle">Filter by overall engagement rate</div>
             </div>
             <div class="toggle-switch" id="enableEngagementFilterToggle"></div>
         </div>
         <div id="engagementRateContainer">
             <label for="engagementRate">Minimum Engagement Rate (%):</label>
             <input type="number" id="engagementRate" min="1" max="100" value="5">
+        </div>
+    </div>
+
+    <div class="setting">
+        <div class="filter-header">
+            <div>
+                <div class="filter-title">Individual Engagement Filters</div>
+                <div class="filter-subtitle">Filter by specific engagement metrics</div>
+            </div>
+            <div class="toggle-switch" id="enableIndividualFiltersToggle"></div>
+        </div>
+        <div id="individualFiltersContainer">
+            <div class="engagement-filter-row">
+                <label for="minLikes">Minimum Likes:</label>
+                <input type="number" id="minLikes" min="0" value="0" placeholder="0">
+            </div>
+            <div class="engagement-filter-row">
+                <label for="minComments">Minimum Comments:</label>
+                <input type="number" id="minComments" min="0" value="0" placeholder="0">
+            </div>
+            <div class="engagement-filter-row">
+                <label for="minReposts">Minimum Reposts:</label>
+                <input type="number" id="minReposts" min="0" value="0" placeholder="0">
+            </div>
+            <div class="engagement-filter-row">
+                <label for="minBookmarks">Minimum Bookmarks:</label>
+                <input type="number" id="minBookmarks" min="0" value="0" placeholder="0">
+            </div>
+            <div class="engagement-filter-row">
+                <label for="minViews">Minimum Views:</label>
+                <input type="number" id="minViews" min="0" value="0" placeholder="0">
+            </div>
         </div>
     </div>
 
@@ -487,6 +552,8 @@
             </div>
         </div>
     </div>
+
+
 
     <button id="saveSettings">Save Settings</button>
 
